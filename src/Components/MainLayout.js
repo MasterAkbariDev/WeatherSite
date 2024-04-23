@@ -15,11 +15,25 @@ const MainLayout = () => {
     const [loading, setLoading] = useState(true)
 
     const getWeather = async (location) => {
+        setError(false)
         setLoading(true)
-        const response = await axios(`http://api.weatherapi.com/v1/current.json?key=${api}&q=${location}&aqi=no`)
-        if (response.data)
+        setWeatherData(null)
+        try {
+            const response = await axios(`https://api.weatherapi.com/v1/current.json?key=${api}&q=${location}&aqi=no`)
+            if (response.data) {
+                setLoading(false)
+                setWeatherData(response.data)
+            }
+            else if (response.data.error) {
+                setLoading(false)
+                setError(true)
+            }
+        } catch (err) {
+            setError(true)
             setLoading(false)
-        return response.data
+            console.log(err);
+        }
+
     }
 
 
@@ -29,15 +43,11 @@ const MainLayout = () => {
 
     useEffect(() => {
         if (ipAddress !== null && ipAddress !== undefined && ipAddress !== '') {
-            getWeather(ipAddress).then(res => {setWeatherData(res); setError(false)}).catch(err => {setError(true);setLoading(false)})
+            getWeather(ipAddress)
         }
     }, [ipAddress])
 
     useEffect(() => {
-        if (loading) {
-            setWeatherData(null)
-            setError(false)
-        }
         if (!loading) {
             searchInputRef.current.focus();
         }
@@ -48,7 +58,7 @@ const MainLayout = () => {
 
     const searchWeatherHandler = () => {
         setSearchInput('')
-        getWeather(searchInput).then(response => {setWeatherData(response); setError(false)}).catch(err => {setError(true);setLoading(false)})
+        getWeather(searchInput)
     }
 
     const handleKeyPress = (e) => {
@@ -58,7 +68,7 @@ const MainLayout = () => {
 
     return (
 
-        <div className="bg-black/30 flex flex-col justify-center items-center text-white w-3/4 h-max min-h-[300px] py-8 px-12 rounded-xl">
+        <div className="bg-black/30 flex flex-col justify-center items-center text-white w-9/10 md:w-3/4 h-max min-h-[300px] py-8 px-4 lg:px-12 rounded-xl">
             {!loading ? (
                 <Fragment>
                     <div className="w-full h-max relative flex items-center bg-white rounded-2xl mb-8">
