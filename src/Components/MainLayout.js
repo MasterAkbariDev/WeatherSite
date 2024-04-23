@@ -16,7 +16,7 @@ const MainLayout = () => {
 
     const getWeather = async (location) => {
         setLoading(true)
-        const response = await axios(`http://api.weatherapi.com/v1/current.json?key=${api}&q=${location}&aqi=no`)
+        const response = await axios(`https://api.weatherapi.com/v1/current.json?key=${api}&q=${location}&aqi=no`)
         if (response.data)
             setLoading(false)
         return response.data
