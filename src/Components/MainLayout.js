@@ -16,10 +16,11 @@ const MainLayout = () => {
 
     const getWeather = async (location) => {
         setLoading(true)
-        const response = await axios(`https://api.weatherapi.com/v1/current.json?key=${api}&q=${location}&aqi=no`)
-        if (response.data)
-            setLoading(false)
-        return response.data
+        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${api}&q=${location}&aqi=no`)
+        if (response.ok)
+            setWeatherData(await response.json());
+        if (!response.ok)
+            setError(true)
     }
 
 
@@ -28,10 +29,17 @@ const MainLayout = () => {
     }, [])
 
     useEffect(() => {
-        if (ipAddress !== null && ipAddress !== undefined && ipAddress !== '') {
-            getWeather(ipAddress).then(res => {setWeatherData(res); setError(false)}).catch(err => {setError(true);setLoading(false)})
-        }
+        if (ipAddress !== null && ipAddress !== undefined && ipAddress !== '')
+            getWeather(ipAddress)
+
     }, [ipAddress])
+
+    useEffect(() => {
+        if (weatherData)
+            setLoading(false)
+    }, [weatherData])
+
+
 
     useEffect(() => {
         if (loading) {
@@ -43,12 +51,17 @@ const MainLayout = () => {
         }
     }, [loading])
 
+    useEffect(() => {
+        if (error)
+            setLoading(false)
+    }, [error])
+
 
 
 
     const searchWeatherHandler = () => {
         setSearchInput('')
-        getWeather(searchInput).then(response => {setWeatherData(response); setError(false)}).catch(err => {setError(true);setLoading(false)})
+        getWeather(searchInput)
     }
 
     const handleKeyPress = (e) => {
